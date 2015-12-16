@@ -6,17 +6,26 @@
 * "spikes" made from scaled spheres.
 */
 
+float sMouseX = 0;
+float sMouseY = 0;
+
+void smoothMouse() {
+  sMouseX = lerp(sMouseX, mouseX, 0.1);
+  sMouseY = lerp(sMouseY, mouseY, 0.1);
+}
+
 
 void setup() {
   size(1200, 720, P3D);
   //we'll make use of HSB colouring later on, to change the hue & saturation
   //as a function of 'branch' and 'rib' index, respectively.
   colorMode(HSB, 1); 
-  pixelDensity(2);
+  //pixelDensity(2);
   noiseSeed(0);
 }
 
 void draw() {
+  smoothMouse();
   background(0.3, 0.3, 0.2);
   pushMatrix();
   lights();
@@ -35,11 +44,11 @@ void alienThing() {
   float n = 6;
   // the rotation at each iteration inside the nested loop will be scaled
   // by this overal base rotation which depends on the mouse
-  float baseR = (mouseX / (float) width) - 0.5;
+  float baseR = (sMouseX / (float) width) - 0.5;
   //outer loop over 'i' where 'n' is the number of 'branches'
   for (int i=0; i<n; i++) {
-    rotateZ(2*PI/n);
     pushMatrix();
+    rotateZ(i*2*PI/n);
     //inner loop over 'j' where 20 is the number of 'ribs'
     for (int j=0; j<20; j++) {
       fill(i/n, j/20.f, 1);
@@ -50,7 +59,7 @@ void alienThing() {
       rotateZ(baseR * noise(i, j, frameCount*0.01));
       shininess(j);
       // vary the Y scale between 0.2 & 1.2 as a function of mouseY.
-      scale(1, 1.2 - (mouseY/(float)height), 1);
+      scale(1, 1.2 - (sMouseY/(float)height), 1);
       pushMatrix();
       //scale(5*noise(i, j, frameCount*0.01));
       scale(5*noise(modelX(0,0,0), modelY(0,0,0), frameCount*0.01));
